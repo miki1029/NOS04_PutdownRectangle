@@ -6,10 +6,14 @@ int main(void)
 {
     srand((unsigned int)time(NULL));
 
-    AutoUser au(new Board());
+    AutoUser au;
 
-    cout << "시작" << endl;
-    au.AutoPlay();
+    while (true)
+    {
+        cout << "시작" << endl;
+        au.NewGame();
+        au.AutoPlay();
+    }
 
     return 0;
 }

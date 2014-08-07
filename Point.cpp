@@ -3,7 +3,7 @@
 #include "Point.h"
 
 Point::Point(int x, int y, Board* board, State::Enum state)
-: x(x), y(y), board(board), state(state), sum(0), count(0)
+: x(x), y(y), board(board), state(state), sum(0), lastTurn(0)
 {
 }
 
@@ -19,17 +19,17 @@ void Point::ChangeState(State::Enum state)
     if (this->state == State::Dead) return;
     if (this->state != state)
     {
-        cout << "(" << x << ", " << y << ") ";
+        cout << "    (" << x << ", " << y << ") ";
         switch (this->state)
         {
         case State::Normal:
-            cout << "보통 상태에서 ";
+            cout << "보통->";
             break;
         case State::Danger:
-            cout << "위험 상태에서 ";
+            cout << "위험->";
             break;
         case State::Dead:
-            cout << "죽음 상태에서 ";
+            cout << "죽음->";
             break;
         default:
             break;
@@ -37,13 +37,13 @@ void Point::ChangeState(State::Enum state)
         switch (state)
         {
         case State::Normal:
-            cout << "보통 상태로 변경" << endl;
+            cout << "보통" << endl;
             break;
         case State::Danger:
-            cout << "위험 상태로 변경" << endl;
+            cout << "위험" << endl;
             break;
         case State::Dead:
-            cout << "죽음 상태로 변경" << endl;
+            cout << "죽음" << endl;
             break;
         default:
             break;
@@ -61,6 +61,7 @@ void Point::ChangeState(State::Enum state)
     // 죽은칸과 인접한 면은 모두 위험상태가 된다.
     if (state == State::Dead)
     {
+        board->IncDeadCnt(); // 죽은 칸 수 증가
         GetLeft()->ChangeState(State::Danger);
         GetRight()->ChangeState(State::Danger);
         GetUp()->ChangeState(State::Danger);
@@ -68,7 +69,7 @@ void Point::ChangeState(State::Enum state)
     }
 }
 
-bool Point::PutSquare(int number)
+bool Point::PutSquare(const int number)
 {
     // 사각형을 놓을 수 없는 자리인 경우
     if (!CheckPutSquare())
@@ -77,8 +78,8 @@ bool Point::PutSquare(int number)
     }
 
     cout << number << " (" << x << ", " << y << ")" << endl;
-    // 사각형이 놓인 횟수 증가
-    count++;
+    // 현재 턴을 저장함
+    lastTurn = board->GetTurn();
 
     // 사각형 숫자의 합 증가
     AddSum(number);
@@ -115,13 +116,14 @@ bool Point::CheckPutSquare()
 
     // 죽은칸에는 사각형을 겹쳐놓을 수 없으며,
     // 죽은칸에 겹쳐놓을 경우 해당 사각형이 놓인 칸이 모두 죽은칸이 된다.
+    // -> 아에 놓지 않는 것으로 처리
     if (IsDead() ||
         GetRight()->IsDead() ||
         GetDown()->IsDead() ||
         GetRightDown()->IsDead())
     {
-        cout << "죽은 칸에 겹쳐 놓을 수 없음";
-        cout << " (" << x << ", " << y << ")" << endl;
+        /*cout << "죽은 칸에 겹쳐 놓을 수 없음";
+        cout << " (" << x << ", " << y << ")" << endl;*/
         return false;
         /*ChangeState(State::Dead);
         GetRight()->ChangeState(State::Dead);
@@ -131,10 +133,11 @@ bool Point::CheckPutSquare()
     }
     // 직전 16번 동안 놓았던 좌표에 사각형을 놓을 경우
     // 해당 사각형이 놓인 칸은 모두 죽은칸이 된다.
-    else if (count >= 16)
+    // -> 아에 놓지 않는 것으로 처리
+    else if (lastTurn != 0 && lastTurn + Board::InputSize > board->GetTurn() - 1)
     {
-        cout << "16회 초과";
-        cout << " (" << x << ", " << y << ")" << endl;
+        /*cout << (lastTurn + Board::InputSize) - (board->GetTurn() - 1) << "턴 후 놓을 수 있는 자리 ";
+        cout << " (" << x << ", " << y << ")" << endl;*/
         return false;
     }
     // 인접한 칸이 모두 죽은칸인 곳에는 사각형을 놓을 수 없다.
@@ -147,8 +150,8 @@ bool Point::CheckPutSquare()
         GetRightDown()->GetRight()->IsDead() &&
         GetRightDown()->GetDown()->IsDead())
     {
-        cout << "인접 칸이 모두 죽음";
-        cout << " (" << x << ", " << y << ")" << endl;
+        /*cout << "인접 칸이 모두 죽음";
+        cout << " (" << x << ", " << y << ")" << endl;*/
         return false;
     }
     return true;

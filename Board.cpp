@@ -3,7 +3,7 @@
 #include "Point.h"
 
 Board::Board()
-: outPoint(make_shared<Point>(-1, -1, this, State::Dead)), flagInc(false)
+: outPoint(make_shared<Point>(-1, -1, this, State::Dead)), deadCnt(4)
 {
     // 2차원 Point 초기화
     for (int x = 0; x < XSize; x++)
@@ -30,16 +30,20 @@ Board::Board()
     }
 
     // squareInput 초기화
-    for (int i = 0; i < InputSize; i++)
+    for (int i = 0; i < 9; i++)
     {
         squareInput[i] = i + 1;
     }
-    curInput = squareInput.begin() + 1;
+    for (int i = 9; i < InputSize; i++)
+    {
+        squareInput[i] = 17 - i;
+    }
+    curInput = squareInput.begin();
 
     // square 초기화
     for (int i = 0; i < BufferSize; i++)
     {
-        square[i] = GetNextInput();
+        squareHand[i] = GetNextInput();
     }
 }
 
@@ -49,15 +53,18 @@ Board::~Board()
 }
 
 
-void Board::UseSquare(int idx, int x, int y)
+bool Board::UseSquare(int idx, int x, int y)
 {
-    if (GetPoint(x, y)->PutSquare(square[idx]))
+    if (GetPoint(x, y)->PutSquare(squareHand[idx]))
     {
         // 결과 값 저장
-        output.push_back(Output{ square[idx], x, y });
+        outputVect.push_back(Output{ squareHand[idx], x, y });
         // 다음 input 가져옴
-        square[idx] = GetNextInput();
+        squareHand[idx] = GetNextInput();
+
+        return true;
     }
+    else return false;
 }
 
 void Board::SaveToFile()
@@ -65,9 +72,10 @@ void Board::SaveToFile()
     ofstream outStream;
     outStream.open("output.txt");
 
-    for each (Output itr in output)
+    outStream << GetSquareSum() << endl;
+    for each (Output output in outputVect)
     {
-        outStream << itr.n << " " << itr.x << " " << itr.y << endl;
+        outStream << output.n << " " << output.x << " " << output.y << endl;
     }
 
     outStream.close();
@@ -75,30 +83,21 @@ void Board::SaveToFile()
 
 int Board::GetNextInput()
 {
-    // 양 끝에 도달하면 방향을 반대로
+    // 끝에 도달하면 처음으로
     if (curInput == squareInput.end())
     {
-        flagInc = false;
-        curInput --;
-    }
-    else if (curInput == squareInput.begin())
-    {
-        flagInc = true;
-        curInput++;
+        curInput = squareInput.begin();
     }
 
-    // 리턴 값 설정
-    int next = 0;
-    if (flagInc)
-    {
-        next = *curInput;
-        curInput++;
-    }
-    else
-    {
-        curInput--;
-        next = *curInput;
-    }
+    return *(curInput++);
+}
 
-    return next;
+int Board::GetSquareSum()
+{
+    int sum = 0;
+    for each (Output output in outputVect)
+    {
+        sum += output.n;
+    }
+    return sum;
 }
