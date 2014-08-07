@@ -1,5 +1,6 @@
 #include "AutoUser.h"
 #include <iostream>
+#include <string>
 
 AutoUser::AutoUser(unique_ptr<Board> board)
 : board(move(board)), maxSquareSum(0)
@@ -28,18 +29,24 @@ void AutoUser::AutoPlay()
             unputdownableSet.insert(UnputdownablePoint{ x, y });
         }
     }
-    cout << board->GetDeadCnt() << endl;
-    cout << "\t\t\t\t\t\t" << board->GetSquareSum() << endl;
-    if (board->GetSquareSum() > maxSquareSum)
+
+    int squareSum = board->GetSquareSum();
+    if (squareSum > 1400)
+    {
+        string filename = to_string(squareSum) + ".txt";
+        cout << filename << endl;
+        board->SaveToFile(filename.c_str());
+    }
+    if (squareSum > maxSquareSum)
     {
         board->SaveToFile();
-        maxSquareSum = board->GetSquareSum();
+        maxSquareSum = squareSum;
+        cout << maxSquareSum << endl;
     }
 }
 
 void AutoUser::NewGame()
 {
-    board.release();
     board = make_unique<Board>();
     unputdownableSet.clear();
 }

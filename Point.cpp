@@ -1,4 +1,4 @@
-#include <iostream>
+//#include <iostream>
 #include <cassert>
 #include "Point.h"
 
@@ -17,7 +17,7 @@ void Point::ChangeState(State::Enum state)
 {
     // 이미 죽은 칸이면 무시
     if (this->state == State::Dead) return;
-    if (this->state != state)
+    /*if (this->state != state)
     {
         cout << "    (" << x << ", " << y << ") ";
         switch (this->state)
@@ -48,7 +48,7 @@ void Point::ChangeState(State::Enum state)
         default:
             break;
         }
-    }
+    }*/
     this->state = state;
     // 위험 또는 죽은 상태로 바뀌면 인접 칸이 죽는지 확인
     if (state != State::Normal)
@@ -77,7 +77,7 @@ bool Point::PutSquare(const int number)
         return false;
     }
 
-    cout << number << " (" << x << ", " << y << ")" << endl;
+    //cout << number << " (" << x << ", " << y << ")" << endl;
     // 현재 턴을 저장함
     lastTurn = board->GetTurn();
 

@@ -56,7 +56,7 @@ public:
     // (x, y)에 idx번째 사각형을 올려 놓음
     bool UseSquare(int idx, int x, int y);
 
-    void SaveToFile();
+    void SaveToFile(const char* filename = "output.txt");
 
     int GetSquareSum();
 

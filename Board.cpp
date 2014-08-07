@@ -1,4 +1,3 @@
-#include <iostream>
 #include <fstream>
 #include "Point.h"
 
@@ -67,10 +66,10 @@ bool Board::UseSquare(int idx, int x, int y)
     else return false;
 }
 
-void Board::SaveToFile()
+void Board::SaveToFile(const char* filename)
 {
     ofstream outStream;
-    outStream.open("output.txt");
+    outStream.open(filename);
 
     outStream << GetSquareSum() << endl;
     for each (Output output in outputVect)
