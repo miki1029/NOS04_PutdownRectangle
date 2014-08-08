@@ -38,6 +38,6 @@ public:
 
     void NewGame();
     void AutoPlay();
-    void AutoPlay2();
+    //void AutoPlay2();
 };
 

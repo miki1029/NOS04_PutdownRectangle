@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string>
+//#include <string>
 #include <algorithm>
 #include "AutoUser.h"
 #include "Point.h"
@@ -48,45 +48,10 @@ void AutoUser::NewGame()
             }
         }
     }
-    cout << "새 게임 시작" << endl;
 }
 
 
 void AutoUser::AutoPlay()
-{
-    while (unputdownableSet.size() < Board::PutdownableSize)
-    {
-        int idx = rand() % Board::BufferSize;
-        int x = rand() % (Board::XSize - 1);
-        int y = rand() % (Board::YSize - 1);
-
-        if (board->UseSquare(idx, x, y))
-        {
-            unputdownableSet.clear();
-        }
-        else
-        {
-            unputdownableSet.insert(board->GetPoint(x, y));
-        }
-    }
-
-    int squareSum = board->GetSquareSum();
-    if (squareSum > 1400)
-    {
-        string filename = to_string(squareSum) + ".txt";
-        cout << filename << endl;
-        board->SaveToFile(filename.c_str());
-    }
-    if (squareSum > maxSquareSum)
-    {
-        board->SaveToFile();
-        maxSquareSum = squareSum;
-        cout << maxSquareSum << endl;
-    }
-}
-
-
-void AutoUser::AutoPlay2()
 {
     while (true)
     {
@@ -139,7 +104,8 @@ void AutoUser::AutoPlay2()
             // 가장 위험상태를 많이 해제할 수 있는 것을 선택
             targetItr = max_element(
                 clearDangerableVect.begin(), clearDangerableVect.end(),
-                [](const PutdownInfo& left, const PutdownInfo& right) {
+                [](const PutdownInfo& left, const PutdownInfo& right) -> bool
+            {
                 return left.clearCnt < right.clearCnt;
             });
         }
@@ -148,7 +114,8 @@ void AutoUser::AutoPlay2()
             // 가장 높은 숫자를 선택
             targetItr = max_element(
                 noproblemVect.begin(), noproblemVect.end(),
-                [this](const PutdownInfo& left, const PutdownInfo& right) -> bool {
+                [this](const PutdownInfo& left, const PutdownInfo& right) -> bool
+            {
                 array<int, Board::BufferSize> hand = board->GetSquareHand();
                 return hand[left.idx] < hand[right.idx];
             });
@@ -158,7 +125,8 @@ void AutoUser::AutoPlay2()
             // 가장 위험상태를 적게 만드는 것을 선택
             targetItr = min_element(
                 dangerableVect.begin(), dangerableVect.end(),
-                [](const PutdownInfo& left, const PutdownInfo& right) {
+                [](const PutdownInfo& left, const PutdownInfo& right) -> bool
+            {
                 return left.dangerCnt < right.dangerCnt;
             });
         }
@@ -167,7 +135,8 @@ void AutoUser::AutoPlay2()
             // 가장 죽음상태를 적게 만드는 것을 선택
             targetItr = min_element(
                 deadableVect.begin(), deadableVect.end(),
-                [](const PutdownInfo& left, const PutdownInfo& right) {
+                [](const PutdownInfo& left, const PutdownInfo& right) -> bool
+            {
                 return left.deadCnt < right.deadCnt;
             });
         }
@@ -195,16 +164,56 @@ void AutoUser::AutoPlay2()
 
     // 결과 저장
     int squareSum = board->GetSquareSum();
-    if (squareSum > 10000)
+    /*if (squareSum > 10000)
     {
         string filename = to_string(squareSum) + ".txt";
         cout << filename << endl;
         board->SaveToFile(filename.c_str());
-    }
+    }*/
     if (squareSum > maxSquareSum)
     {
         board->SaveToFile();
         maxSquareSum = squareSum;
-        cout << maxSquareSum << endl;
+        if (board->GetOutput().size() >= 10000)
+        {
+            cout << squareSum << endl;
+            exit(0); // 1만개 이상의 결과값이 나오면 종료
+        }
     }
+    //cout << squareSum << endl;
 }
+
+
+// 완전 랜덤으로 짠 구조
+/*void AutoUser::AutoPlay2()
+{
+while (unputdownableSet.size() < Board::PutdownableSize)
+{
+int idx = rand() % Board::BufferSize;
+int x = rand() % (Board::XSize - 1);
+int y = rand() % (Board::YSize - 1);
+
+if (board->UseSquare(idx, x, y))
+{
+unputdownableSet.clear();
+}
+else
+{
+unputdownableSet.insert(board->GetPoint(x, y));
+}
+}
+
+int squareSum = board->GetSquareSum();
+if (squareSum > 1400)
+{
+string filename = to_string(squareSum) + ".txt";
+cout << filename << endl;
+board->SaveToFile(filename.c_str());
+}
+if (squareSum > maxSquareSum)
+{
+board->SaveToFile();
+maxSquareSum = squareSum;
+cout << maxSquareSum << endl;
+}
+}*/

@@ -4,10 +4,9 @@
 
 int main(void)
 {
-    // 1738 seed°ª: 1407413398, 1407438065
-    unsigned int seed = (unsigned int)time(NULL);
+    /*unsigned int seed = (unsigned int)time(NULL);
     srand(seed);
-    cout << seed << endl;
+    cout << seed << endl;*/
 
     Timer timer;
     timer.Start(9 * 60 * 1000);
@@ -16,7 +15,7 @@ int main(void)
     while (timer.RunState())
     {
         au.NewGame();
-        au.AutoPlay2();
+        au.AutoPlay();
     }
 
     return 0;

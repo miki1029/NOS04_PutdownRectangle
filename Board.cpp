@@ -109,7 +109,7 @@ void Board::SaveToFile(const char* filename)
     ofstream outStream;
     outStream.open(filename);
 
-    outStream << GetSquareSum() << endl;
+    //outStream << GetSquareSum() << endl;
     for each (Output output in outputVect)
     {
         outStream << output.n << " " << output.x << " " << output.y << endl;
