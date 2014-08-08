@@ -12,6 +12,7 @@ Timer::~Timer()
     th.detach();
 }
 
+
 void Timer::Start(int ms)
 {
     chrono::milliseconds time = chrono::milliseconds(ms);
@@ -24,6 +25,7 @@ void Timer::Start(int ms)
         cout << "타이머 끝" << endl;
     });
 }
+
 
 void Timer::Stop()
 {

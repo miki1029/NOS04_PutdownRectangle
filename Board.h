@@ -2,6 +2,7 @@
 #include <memory>
 #include <array>
 #include <vector>
+#include "defEnum.h"
 class Point;
 
 using namespace std;
@@ -34,6 +35,7 @@ private:
 
 public:
     explicit Board();
+    Board(const Board& arg);
     ~Board();
 
     // (x, y) 칸 Point를 가져옴
@@ -42,23 +44,21 @@ public:
         if (x < 0 || y < 0 || x > XSize - 1 || y > YSize - 1) return outPoint;
         else return arr[x][y];
     }
-    // 죽은 칸 수 증가
-    inline void IncDeadCnt() { deadCnt++; }
-    // 카드 목록을 가져옴
-    inline array<int, BufferSize>& GetSquareHand() { return squareHand; }
-    // 턴 수
-    inline int GetTurn() { return outputVect.size() + 1; }
-    // 칸이 모두 죽었는지 확인
-    inline bool IsAllDead() { return deadCnt >= DeadCntMax; }
-    inline int GetDeadCnt() { return deadCnt; }
-    inline vector<Output> GetOutput() { return outputVect; }
+    inline void IncDeadCnt() { deadCnt++; } // 죽은 칸 수 증가
+    inline array<int, BufferSize>& GetSquareHand() { return squareHand; } // 사각형 목록
+    inline int GetTurn() { return outputVect.size() + 1; } // 턴 수
+    inline bool IsAllDead() { return deadCnt >= DeadCntMax; } // 칸이 모두 죽었는지 확인
+    inline int GetDeadCnt() { return deadCnt; } // 죽은 칸 수
+    inline vector<Output> GetOutput() { return outputVect; } // 놓은 사각형 목록(결과값)
+    int GetSquareSum();
 
     // (x, y)에 idx번째 사각형을 올려 놓음
     bool UseSquare(int idx, int x, int y);
+    // 사각형을 가상으로 올려 상태 변화를 체크함
+    ExpectPutdown::Enum CheckSquare(int idx, int x, int y,
+        int* clearCnt, int* dangerCnt, int* deadCnt);
 
     void SaveToFile(const char* filename = "output.txt");
-
-    int GetSquareSum();
 
 private:
     // 다음 사각형 input을 가져옴

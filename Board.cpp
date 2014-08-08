@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 #include "Point.h"
 
 Board::Board()
@@ -47,8 +48,37 @@ Board::Board()
 }
 
 
+Board::Board(const Board& arg)
+: outPoint(make_shared<Point>(*arg.outPoint)), deadCnt(arg.deadCnt),
+squareInput(arg.squareInput), curInput(arg.curInput), squareHand(arg.squareHand),
+outputVect(arg.outputVect)
+{
+    // 2차원 Point 깊은 복사
+    for (int x = 0; x < XSize; x++)
+    {
+        for (int y = 0; y < YSize; y++)
+        {
+            arr[x][y] = make_shared<Point>(*arg.arr[x][y]);
+            arr[x][y]->SetBoard(this);
+        }
+    }
+}
+
+
 Board::~Board()
 {
+}
+
+
+
+int Board::GetSquareSum()
+{
+    int sum = 0;
+    for each (Output output in outputVect)
+    {
+        sum += output.n;
+    }
+    return sum;
 }
 
 
@@ -66,6 +96,14 @@ bool Board::UseSquare(int idx, int x, int y)
     else return false;
 }
 
+
+ExpectPutdown::Enum Board::CheckSquare(int idx, int x, int y,
+    int* clearCnt, int* dangerCnt, int* deadCnt)
+{
+    return GetPoint(x, y)->CheckPutSquare(squareHand[idx], clearCnt, dangerCnt, deadCnt);
+}
+
+
 void Board::SaveToFile(const char* filename)
 {
     ofstream outStream;
@@ -80,6 +118,7 @@ void Board::SaveToFile(const char* filename)
     outStream.close();
 }
 
+
 int Board::GetNextInput()
 {
     // 끝에 도달하면 처음으로
@@ -89,14 +128,4 @@ int Board::GetNextInput()
     }
 
     return *(curInput++);
-}
-
-int Board::GetSquareSum()
-{
-    int sum = 0;
-    for each (Output output in outputVect)
-    {
-        sum += output.n;
-    }
-    return sum;
 }
