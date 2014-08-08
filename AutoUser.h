@@ -1,13 +1,16 @@
 #pragma once
 #include <set>
 #include <vector>
+#include <mutex>
 #include "Board.h"
 
 class AutoUser
 {
 private:
     unique_ptr<Board> board;
-    int maxSquareSum;
+    static int maxSquareSum;
+    static mutex _mutex;
+    int threadNum;
 
     struct PutdownInfo
     {
@@ -33,7 +36,7 @@ private:
     set<shared_ptr<Point>> unputdownTurnSet;    // 매턴 초기화
 
 public:
-    explicit AutoUser(unique_ptr<Board> board = nullptr);
+    explicit AutoUser(int threadNum);
     ~AutoUser();
 
     void NewGame();

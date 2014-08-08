@@ -4,8 +4,11 @@
 #include "AutoUser.h"
 #include "Point.h"
 
-AutoUser::AutoUser(unique_ptr<Board> board)
-: board(move(board)), maxSquareSum(0)
+int AutoUser::maxSquareSum = 0;
+mutex AutoUser::_mutex;
+
+AutoUser::AutoUser(int threadNum)
+: threadNum(threadNum)
 {
 }
 
@@ -51,6 +54,9 @@ void AutoUser::NewGame()
 }
 
 
+// 우선순위에 따라 사각형을 놓음.
+// 우선순위가 같은 부분에 대해서 차이가 발생하여 랜덤으로 다른 값이 나옴
+// 최대 68181까지 나왔음(13635개)
 void AutoUser::AutoPlay()
 {
     while (true)
@@ -98,6 +104,7 @@ void AutoUser::AutoPlay()
         }
 
         // 놓을 자리를 선정
+        // 비교값이 같은 부분에 대해 랜덤으로 값이 정해짐
         vector<PutdownInfo>::iterator targetItr;
         if (!clearDangerableVect.empty())
         {
@@ -162,29 +169,29 @@ void AutoUser::AutoPlay()
         unputdownTurnSet.clear();
     }
 
-    // 결과 저장
+    // acquire lock
+    _mutex.lock();
+    // 결과 저장(critical section)
     int squareSum = board->GetSquareSum();
-    /*if (squareSum > 10000)
-    {
-        string filename = to_string(squareSum) + ".txt";
-        cout << filename << endl;
-        board->SaveToFile(filename.c_str());
-    }*/
+    //cout << threadNum << ":" << squareSum << endl;
     if (squareSum > maxSquareSum)
     {
         board->SaveToFile();
         maxSquareSum = squareSum;
+        cout << threadNum << ":" << squareSum << endl;
+        // 만점 조건->종료
         if (board->GetOutput().size() >= 10000)
         {
-            cout << squareSum << endl;
+            //cout << threadNum << ":" << squareSum << endl;
             exit(0); // 1만개 이상의 결과값이 나오면 종료
         }
     }
-    //cout << squareSum << endl;
+    // release lock
+    _mutex.unlock();
 }
 
 
-// 완전 랜덤으로 짠 구조
+// 완전 랜덤으로 짠 구조 최대 1738까지 나왔었음
 /*void AutoUser::AutoPlay2()
 {
 while (unputdownableSet.size() < Board::PutdownableSize)
