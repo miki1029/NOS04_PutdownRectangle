@@ -3,9 +3,12 @@
 #include <algorithm>
 #include "AutoUser.h"
 #include "Point.h"
+#include "Timer.h"
 
 int AutoUser::maxSquareSum = 0;
 mutex AutoUser::_mutex;
+
+extern Timer timer;
 
 AutoUser::AutoUser(int threadNum)
 : threadNum(threadNum)
@@ -56,10 +59,10 @@ void AutoUser::NewGame()
 
 // 우선순위에 따라 사각형을 놓음.
 // 우선순위가 같은 부분에 대해서 차이가 발생하여 랜덤으로 다른 값이 나옴
-// 최대 68181까지 나왔음(13635개)
+// 최대 121148까지 나왔음(24228개)
 void AutoUser::AutoPlay()
 {
-    while (true)
+    while (timer.RunState())
     {
         set<shared_ptr<Point>> eraseSet;
 
@@ -182,7 +185,6 @@ void AutoUser::AutoPlay()
         // 만점 조건->종료
         if (board->GetOutput().size() >= 10000)
         {
-            //cout << threadNum << ":" << squareSum << endl;
             exit(0); // 1만개 이상의 결과값이 나오면 종료
         }
     }

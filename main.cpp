@@ -19,7 +19,7 @@ int main(void)
     srand(seed);
     cout << seed << endl;*/
 
-    timer.Start(580 * 1000);
+    timer.Start(590 * 1000);
 
     AutoUser au1(1);
     AutoUser au2(2);
